@@ -2,11 +2,6 @@
 <html>
   <head>
     <title>Socket.IO chat</title>
-    <!-- <link
-      rel="stylesheet"
-      type="text/css"
-      href="/app.css"
-    /> -->
     <style>
       * {
         margin: 0;
@@ -46,6 +41,29 @@
       #messages li:nth-child(odd) {
         background: #eee;
       }
+      #drawing-queue {
+        width: 102px;
+        height: 300px;
+        background-color: #cccccc;
+        border: 1px solid black;
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: flex-start;
+        align-items: flex-start;
+      }
+      #board-container {
+        height: 400px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        align-items: center;
+      }
+      #board {
+        height: 300px;
+        width: 400px;
+        background-color: #eee;
+        border: 1px solid black;
+      }
       .row {
         height: 3px;
         width: 100%;
@@ -62,232 +80,88 @@
         background-color: #3338ff;
         border: 1px solid black;
       }
-    </style>
-  </head>
-  <body>
-    <div
-      style="
+      .button-container {
+        width: 300px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+      .button {
+        width: 125px;
+        height: 50px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-family: "Courier New", Courier, monospace;
+        font-size: 20px;
+        font-weight: 800;
+      }
+      .colour {
+        border: 2px solid black;
+        height: 20px;
+        width: 20px;
+      }
+      .background {
         height: 100vh;
         width: 100vw;
         background-color: #888;
         display: flex;
         flex-direction: column;
-      "
-      ;
-    >
-      <div
-        style="
-          height: 30px;
-          width: 100%;
-          background-color: #000;
-          color: #ffffff;
-        "
-      >
+      }
+      .topbar {
+        height: 30px;
+        width: 100%;
+        background-color: #000;
+        color: #ffffff;
+      }
+      .container {
+        display: flex;
+        justify-content: space-around;
+        align-items: center;
+        width: 100%;
+        flex-grow: 1;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="background">
+      <div class="topbar">
         Name: <input type="text" id="name" placeholder="Name" /> Target:
         <input type="text" id="target" placeholder="Target" />
       </div>
-      <div
-        style="
-          display: flex;
-          justify-content: space-around;
-          align-items: center;
-          width: 100%;
-          flex-grow: 1;
-        "
-      >
+      <div class="container">
         <div id="colour-picker">
-          <div
-            style="
-              background-color: #ff4433;
-              border: 2px solid black;
-              height: 20px;
-              width: 20px;
-            "
-            class="colour"
-          ></div>
-          <div
-            style="
-              background-color: #3338ff;
-              border: 2px solid black;
-              height: 20px;
-              width: 20px;
-            "
-            class="colour"
-          ></div>
-          <div
-            style="
-              background-color: #ee8c44;
-              border: 2px solid black;
-              height: 20px;
-              width: 20px;
-            "
-            class="colour"
-          ></div>
-          <div
-            style="
-              background-color: #4ad8e8;
-              border: 2px solid black;
-              height: 20px;
-              width: 20px;
-            "
-            class="colour"
-          ></div>
-          <div
-            style="
-              background-color: #6ac86f;
-              border: 2px solid black;
-              height: 20px;
-              width: 20px;
-            "
-            class="colour"
-          ></div>
-          <div
-            style="
-              background-color: #9659d9;
-              border: 2px solid black;
-              height: 20px;
-              width: 20px;
-            "
-            class="colour"
-          ></div>
-          <div
-            style="
-              background-color: #c57eaa;
-              border: 2px solid black;
-              height: 20px;
-              width: 20px;
-            "
-            class="colour"
-          ></div>
-          <div
-            style="
-              background-color: #f4ee00;
-              border: 2px solid black;
-              height: 20px;
-              width: 20px;
-            "
-            class="colour"
-          ></div>
-          <div
-            style="
-              background-color: #099401;
-              border: 2px solid black;
-              height: 20px;
-              width: 20px;
-            "
-            class="colour"
-          ></div>
-          <div
-            style="
-              background-color: #7a371b;
-              border: 2px solid black;
-              height: 20px;
-              width: 20px;
-            "
-            class="colour"
-          ></div>
-          <div
-            style="
-              background-color: #ffffff;
-              border: 2px solid black;
-              height: 20px;
-              width: 20px;
-            "
-            class="colour"
-          ></div>
-          <div
-            style="
-              background-color: #000000;
-              border: 2px solid black;
-              height: 20px;
-              width: 20px;
-            "
-            class="colour"
-          ></div>
+          <div style="background-color: #ff4433;" class="colour"></div>
+          <div style="background-color: #3338ff;" class="colour"></div>
+          <div style="background-color: #ee8c44;" class="colour"></div>
+          <div style="background-color: #4ad8e8;" class="colour"></div>
+          <div style="background-color: #6ac86f;" class="colour"></div>
+          <div style="background-color: #9659d9;" class="colour"></div>
+          <div style="background-color: #c57eaa;" class="colour"></div>
+          <div style="background-color: #f4ee00;" class="colour"></div>
+          <div style="background-color: #099401;" class="colour"></div>
+          <div style="background-color: #7a371b;" class="colour"></div>
+          <div style="background-color: #ffffff;" class="colour"></div>
+          <div style="background-color: #000000;" class="colour"></div>
           <div style="height: 20px; width: 20px;"></div>
           <div
-            style="
-              background-color: #000000;
-              border: 2px solid black;
-              height: 20px;
-              width: 20px;
-            "
+            style="background-color: #000000;"
+            class="colour"
             id="current-colour"
           ></div>
         </div>
-        <div
-          style="
-            height: 400px;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            align-items: center;
-          "
-        >
-          <div
-            style="
-              height: 300px;
-              width: 400px;
-              background-color: #eee;
-              border: 1px solid black;
-            "
-            id="board"
-          ></div>
-          <div
-            style="
-              width: 300px;
-              display: flex;
-              justify-content: space-between;
-              align-items: center;
-            "
-          >
-            <div
-              id="send"
-              style="
-                width: 125px;
-                height: 50px;
-                background-color: #3338ff;
-                display: flex;
-                justify-content: center;
-                align-items: center;
-                font-family: 'Courier New', Courier, monospace;
-                font-size: 20px;
-                font-weight: 800;
-              "
-            >
+        <div id="board-container">
+          <div id="board"></div>
+          <div class="button-container">
+            <div id="send" class="button" style="background-color: #3338ff;">
               <span>Done</span>
             </div>
-            <div
-              id="clear"
-              style="
-                width: 125px;
-                height: 50px;
-                background-color: #ff4433;
-                display: flex;
-                justify-content: center;
-                align-items: center;
-                font-family: 'Courier New', Courier, monospace;
-                font-size: 20px;
-                font-weight: 800;
-              "
-            >
+            <div id="clear" class="button" style="background-color: #ff4433;">
               <span>Clear</span>
             </div>
           </div>
         </div>
-        <div
-          id="drawing-queue"
-          style="
-            width: 102px;
-            height: 300px;
-            background-color: #cccccc;
-            border: 1px solid black;
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: flex-start;
-            align-items: flex-start;
-          "
-        ></div>
+        <div id="drawing-queue"></div>
       </div>
     </div>
     <script src="/socket.io/socket.io.js"></script>
@@ -357,6 +231,10 @@
             newQueuedItem.classList.add("queued-item");
             newQueuedItem.id = key;
             newQueuedItem.attributes.setNamedItem(dataDrawing);
+            newQueuedItem.innerText = $("#name")
+              .val()
+              .substr(0, 1)
+              .toUpperCase();
             console.log(newQueuedItem);
             $("#drawing-queue").append(newQueuedItem);
             $(".queued-item").click((e) => {
