@@ -16,11 +16,11 @@ io.on("connection", (socket) => {
     console.log("message: " + data);
     io.emit("paint", data);
   });
-  socket.on("done", ({ data, target }) => {
+  socket.on("done", ({ data, target, sub }) => {
     const key = uuid();
     cache.set(key, data);
     console.log(typeof data, data);
-    io.emit("done", { key, target });
+    io.emit("done", { key, target, sub });
   });
   socket.on("load", ({ key, sub }) => {
     const data = cache.get(key);

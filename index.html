@@ -9,7 +9,7 @@
         box-sizing: border-box;
       }
       body {
-        font: 13px Helvetica, Arial;
+        font-family: "Courier New", Courier, monospace;
       }
       form {
         background: #000;
@@ -77,8 +77,12 @@
         height: 46px;
         width: 46px;
         margin: 2px;
-        background-color: #3338ff;
+        background-color: #6265f3;
         border: 1px solid black;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-weight: 800;
       }
       .button-container {
         width: 300px;
@@ -92,7 +96,6 @@
         display: flex;
         justify-content: center;
         align-items: center;
-        font-family: "Courier New", Courier, monospace;
         font-size: 20px;
         font-weight: 800;
       }
@@ -219,11 +222,15 @@
             });
             data.push(rowData);
           });
-          socket.emit("done", { data, target: $("#target").val() });
+          socket.emit("done", {
+            data,
+            target: $("#target").val(),
+            sub: $("#name").val(),
+          });
           clearBoard();
         });
 
-        socket.on("done", function ({ key, target }) {
+        socket.on("done", function ({ key, target, sub }) {
           if (target === $("#name").val() || target == "") {
             var newQueuedItem = document.createElement("div");
             var dataDrawing = document.createAttribute("data-drawing");
@@ -231,10 +238,10 @@
             newQueuedItem.classList.add("queued-item");
             newQueuedItem.id = key;
             newQueuedItem.attributes.setNamedItem(dataDrawing);
-            newQueuedItem.innerText = $("#name")
-              .val()
+            var name = (document.createElement("span").innerText = sub
               .substr(0, 1)
-              .toUpperCase();
+              .toUpperCase());
+            newQueuedItem.append(name);
             console.log(newQueuedItem);
             $("#drawing-queue").append(newQueuedItem);
             $(".queued-item").click((e) => {
