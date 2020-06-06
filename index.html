@@ -83,7 +83,8 @@
           color: #ffffff;
         "
       >
-        Name: <input type="text" id="colour" placeholder="Name" />
+        Name: <input type="text" id="name" placeholder="Name" /> Target:
+        <input type="text" id="target" placeholder="Target" />
       </div>
       <div
         style="
@@ -294,7 +295,8 @@
     <script>
       $(function () {
         localStorage.setItem("sub", Math.floor(Math.random() * 1000000));
-        console.log(localStorage.getItem("sub"));
+        var socket = io();
+
         let mouseDown = 0;
         document.body.onmousedown = () => (mouseDown = 1);
         document.body.onmouseup = () => (mouseDown = 0);
@@ -330,7 +332,6 @@
           clearBoard();
         });
 
-        var socket = io();
         $(".cell").mouseover((e) => applyPaint(e));
 
         $("#send").click(function () {
@@ -344,23 +345,28 @@
             });
             data.push(rowData);
           });
-          socket.emit("done", data);
+          socket.emit("done", { data, target: $("#target").val() });
           clearBoard();
         });
 
-        socket.on("done", function (item) {
-          var newQueuedItem = document.createElement("div");
-          var dataDrawing = document.createAttribute("data-drawing");
-          dataDrawing.value = `${item}`;
-          newQueuedItem.classList.add("queued-item");
-          newQueuedItem.id = item;
-          newQueuedItem.attributes.setNamedItem(dataDrawing);
-          console.log(newQueuedItem);
-          $("#drawing-queue").append(newQueuedItem);
-          $(".queued-item").click((e) => {
-            var key = e.target.getAttribute("data-drawing");
-            socket.emit("load", { key, sub: localStorage.getItem("sub") });
-          });
+        socket.on("done", function ({ key, target }) {
+          if (target === $("#name").val() || target == "") {
+            var newQueuedItem = document.createElement("div");
+            var dataDrawing = document.createAttribute("data-drawing");
+            dataDrawing.value = `${key}`;
+            newQueuedItem.classList.add("queued-item");
+            newQueuedItem.id = key;
+            newQueuedItem.attributes.setNamedItem(dataDrawing);
+            console.log(newQueuedItem);
+            $("#drawing-queue").append(newQueuedItem);
+            $(".queued-item").click((e) => {
+              var key = e.target.getAttribute("data-drawing");
+              socket.emit("load", {
+                key,
+                sub: localStorage.getItem("sub"),
+              });
+            });
+          }
         });
 
         socket.on("load", function ({ data, key, sub }) {
@@ -387,13 +393,6 @@
             });
           }
           $(`#${key}`).remove();
-        });
-
-        socket.on("paint", function (data) {
-          console.log(data);
-          $(`#${data.x}-${data.y}`)
-            .addClass("painted")
-            .css("background-color", data.colour);
         });
       });
     </script>
