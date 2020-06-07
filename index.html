@@ -124,6 +124,15 @@
         width: 100%;
         flex-grow: 1;
       }
+      .weight {
+        border: 2px solid black;
+        height: 20px;
+        width: 20px;
+        display: flex;
+        background-color: #ffffff;
+        justify-content: center;
+        align-items: center;
+      }
     </style>
   </head>
   <body>
@@ -133,25 +142,50 @@
         <input type="text" id="target" placeholder="Target" />
       </div>
       <div class="container">
-        <div id="colour-picker">
-          <div style="background-color: #ff4433;" class="colour"></div>
-          <div style="background-color: #3338ff;" class="colour"></div>
-          <div style="background-color: #ee8c44;" class="colour"></div>
-          <div style="background-color: #4ad8e8;" class="colour"></div>
-          <div style="background-color: #6ac86f;" class="colour"></div>
-          <div style="background-color: #9659d9;" class="colour"></div>
-          <div style="background-color: #c57eaa;" class="colour"></div>
-          <div style="background-color: #f4ee00;" class="colour"></div>
-          <div style="background-color: #099401;" class="colour"></div>
-          <div style="background-color: #7a371b;" class="colour"></div>
-          <div style="background-color: #ffffff;" class="colour"></div>
-          <div style="background-color: #000000;" class="colour"></div>
-          <div style="height: 20px; width: 20px;"></div>
-          <div
-            style="background-color: #000000;"
-            class="colour"
-            id="current-colour"
-          ></div>
+        <div
+          style="width: 100px; display: flex; justify-content: space-between;"
+        >
+          <div id="colour-picker">
+            <div style="background-color: #ff4433;" class="colour"></div>
+            <div style="background-color: #3338ff;" class="colour"></div>
+            <div style="background-color: #ee8c44;" class="colour"></div>
+            <div style="background-color: #4ad8e8;" class="colour"></div>
+            <div style="background-color: #6ac86f;" class="colour"></div>
+            <div style="background-color: #9659d9;" class="colour"></div>
+            <div style="background-color: #c57eaa;" class="colour"></div>
+            <div style="background-color: #f4ee00;" class="colour"></div>
+            <div style="background-color: #099401;" class="colour"></div>
+            <div style="background-color: #7a371b;" class="colour"></div>
+            <div style="background-color: #ffffff;" class="colour"></div>
+            <div style="background-color: #000000;" class="colour"></div>
+            <div style="height: 20px; width: 20px;"></div>
+            <div
+              style="background-color: #000000;"
+              class="colour"
+              id="current-colour"
+            ></div>
+          </div>
+          <div id="weight-picker">
+            <div id="weight-light" class="weight">
+              <div
+                style="background-color: #000; width: 2px; height: 2px;"
+              ></div>
+            </div>
+            <div
+              id="weight-regular"
+              class="weight"
+              style="border: 4px solid black;"
+            >
+              <div
+                style="background-color: #000; width: 4px; height: 4px;"
+              ></div>
+            </div>
+            <div id="weight-bold" class="weight">
+              <div
+                style="background-color: #000; width: 6px; height: 6px;"
+              ></div>
+            </div>
+          </div>
         </div>
         <div id="board-container">
           <div id="board"></div>
@@ -182,6 +216,8 @@
         $(".colour").click(function (e) {
           console.log(e);
           colour = e.target.style.backgroundColor;
+          $(".colour").css("border", "2px solid black");
+          e.target.style.border = "4px solid black";
           $("#current-colour").css("background-color", colour);
         });
 
@@ -193,10 +229,44 @@
           }
         }
 
+        let weight = "weight-regular";
+        $(".weight").click(function (e) {
+          weight = e.target.attributes.id.value;
+          $(".weight").css("border", "2px solid black");
+          e.target.style.border = "4px solid black";
+        });
+
         var applyPaint = (e) => {
           e.preventDefault(); // prevents page reloading
           if (mouseDown === 1) {
-            e.target.style.background = colour;
+            console.log(e);
+            console.log(weight);
+            for (
+              let i =
+                parseInt(e.target.attributes.x.value) -
+                (weight === "weight-bold" ? 1 : 0);
+              i <
+              parseInt(e.target.attributes.x.value) +
+                (weight === "weight-regular" || weight === "weight-bold"
+                  ? 2
+                  : 1);
+              i++
+            ) {
+              for (
+                let j =
+                  parseInt(e.target.attributes.y.value) -
+                  (weight === "weight-bold" ? 1 : 0);
+                j <
+                parseInt(e.target.attributes.y.value) +
+                  (weight === "weight-regular" || weight === "weight-bold"
+                    ? 2
+                    : 1);
+                j++
+              ) {
+                console.log(i, j);
+                $(`#${i}-${j}`).css("background-color", colour);
+              }
+            }
           }
           return false;
         };

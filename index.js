@@ -13,18 +13,15 @@ app.get("/", (req, res) => {
 io.on("connection", (socket) => {
   console.log("a user connected");
   socket.on("paint", (data) => {
-    console.log("message: " + data);
     io.emit("paint", data);
   });
   socket.on("done", ({ data, target, sub }) => {
     const key = uuid();
     cache.set(key, data);
-    console.log(typeof data, data);
     io.emit("done", { key, target, sub });
   });
   socket.on("load", ({ key, sub }) => {
     const data = cache.get(key);
-    console.log(data);
     io.emit("load", { data, key, sub });
   });
   socket.on("disconnect", () => {
