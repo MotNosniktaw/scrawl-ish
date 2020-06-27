@@ -24,11 +24,12 @@ io.on("connection", (socket) => {
     const data = cache.get(key);
     io.emit("load", { data, key, sub });
   });
-  socket.on("disconnect", () => {
+  socket.on("disconnect", (thing) => {
+    console.log(thing);
     console.log("user disconnected");
   });
 });
 
-http.listen(4000, () => {
+http.listen(8080, () => {
   console.log("listening on 4000");
 });
